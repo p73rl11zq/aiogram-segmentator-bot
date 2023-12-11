@@ -6,7 +6,7 @@ from aiogram import Bot, Dispatcher, executor, types
 
 from src.model import *
 
-TOKEN = "6839241100:AAEfCw40tA07EwXTrmoPVOtT_WYU_GXrl-0"
+TOKEN = ""
 SAVE_DIR = './'
 PREDICT_DIR = "./"
 
