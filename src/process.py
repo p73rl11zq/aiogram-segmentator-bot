@@ -21,14 +21,12 @@ def preprocess(frame):
     return frame
 
 
-def vis_parsing_maps(im, parsing_anno, stride, save_im=True, save_name=None):
-    # Colors for all 20 parts
+def vis_parsing_maps(im, parsing_anno, stride):
+    # Colors for all 18 parts
     part_colors = [[255, 0, 0], [255, 85, 0], [255, 170, 0], [255, 0, 85], [255, 0, 170],
                    [0, 255, 0], [85, 255, 0], [170, 255, 0], [0, 255, 85], [0, 255, 170],
                    [0, 0, 255], [85, 0, 255], [170, 0, 255], [0, 85, 255], [0, 170, 255],
-                   [255, 255, 0], [255, 255, 85], [255, 255, 170],
-                   [255, 0, 255], [255, 85, 255], [255, 170, 255],
-                   [0, 255, 255], [85, 255, 255], [170, 255, 255]]
+                   [255, 255, 0], [255, 255, 85], [255, 255, 170]]
 
     im = np.array(im)
     vis_im = im.copy().astype(np.uint8)
@@ -40,17 +38,13 @@ def vis_parsing_maps(im, parsing_anno, stride, save_im=True, save_name=None):
 
     for pi in range(1, num_of_class + 1):
         index = np.where(vis_parsing_anno == pi)
-        vis_parsing_anno_color[index[0], index[1], :] = part_colors[pi]
+        try:
+            vis_parsing_anno_color[index[0], index[1], :] = part_colors[pi]
+        except:
+            print('dimensional mismatch ')
 
     vis_parsing_anno_color = vis_parsing_anno_color.astype(np.uint8)
     # print(vis_parsing_anno_color.shape, vis_im.shape)
     vis_im = cv2.addWeighted(cv2.cvtColor(vis_im, cv2.COLOR_RGB2BGR), 0.4, vis_parsing_anno_color, 0.6, 0)
 
-    # Save result or not
-    if save_im:
-        if save_name is None:
-            save_name = os.getcwd()+'/mask.png'
-        else:
-            pass
-        #cv2.imwrite(save_name[:-4] + '___.png', vis_parsing_anno)
-        cv2.imwrite(save_name, vis_im, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+    return vis_im
