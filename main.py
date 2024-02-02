@@ -6,8 +6,9 @@ import os
 from aiogram import Bot, Dispatcher, executor, types
 
 from src.model import *
+from src.detector import *
 
-TOKEN = ""
+TOKEN = "6839241100:AAEfCw40tA07EwXTrmoPVOtT_WYU_GXrl-0"
 
 logging.basicConfig(level=logging.INFO)
 
@@ -33,14 +34,19 @@ async def photo_handler(message: types.Message):
     predicted_image = save_path +'predict_photo.png'
 
     await message.photo[-1].download(destination_file=image_name)
-
-    model = Model()
-    model.predict(image_name, predicted_image)
-    await bot.send_photo(message.chat.id, open(predicted_image, 'rb'))
-    # remove products
-    files = glob.glob(f'{save_path}*')
-    for f in files:
-        os.remove(f)
+    detector = Retina()
+    face_image = detector.predict(image_name, save_path)
+    if face_image is 0:
+        await message.reply("Sorry, i can't find any segmentable faces in image. Try another image")
+    else:
+        image_name = save_path +"detected.jpg"
+        model = Model()
+        model.predict(image_name, predicted_image)
+        await bot.send_photo(message.chat.id, open(predicted_image, 'rb'))
+        # remove products
+        files = glob.glob(f'{save_path}*')
+        for f in files:
+            os.remove(f)
 
 @dp.message_handler(content_types=["document", ])
 async def photo_handler(message: types.Message):
